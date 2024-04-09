@@ -3,7 +3,7 @@ local Config = require("minimap.config")
 local Buffer = require("minimap.components.buffer")
 local Map = require("minimap.components.map")
 local events = require("minimap.events")
-local util = require("minimap.util")
+local range_helper = require("minimap.util.range")
 
 local M = {}
 
@@ -70,7 +70,7 @@ function M.run(options)
         end
 
         map:set_cursor_line(
-          util.transpose_position(row, buffer.bufnr, map.buffer.bufnr).line
+          range_helper.transpose_position(row, buffer.bufnr, map.buffer.bufnr).line
         )
       end)
     end

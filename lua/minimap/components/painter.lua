@@ -1,6 +1,6 @@
 local Object = require("nui.object")
 local Painter = Object("MinimapPainter")
-local util = require("minimap.util")
+local range_helper = require("minimap.util.range")
 
 function Painter:init(map, painters)
   self._ = {
@@ -35,7 +35,7 @@ function Painter:_paint(buffer)
     if highlight.name ~= "MinimapCursorLine" and highlight.name ~= "MinimapViewport" and highlight.name ~= "MinimapSearch" then
       if highlight.range[1].line == map_current_line then
         highlight.name = highlight.name .. "CursorLine"
-      elseif util.within_range(highlight.range[1].line, self:_transpose_range_to_map(current_viewport, buffer)) then
+      elseif range_helper.within_range(highlight.range[1].line, self:_transpose_range_to_map(current_viewport, buffer)) then
         highlight.name = highlight.name .. "Viewport"
       end
     end
@@ -43,8 +43,8 @@ function Painter:_paint(buffer)
 
   vim.fn.clearmatches(self._.map.winid)
   for _, highlight in pairs(highlights) do
-    -- print("Painting " .. highlight.name .. " range " .. vim.inspect(highlight.range) .. "=".. vim.inspect(util.range_to_matchpos(highlight.range)) .. " priority " .. tostring(highlight.priority))
-    self:_paint_range(highlight.name, util.range_to_matchpos(highlight.range), highlight.priority)
+    -- print("Painting " .. highlight.name .. " range " .. vim.inspect(highlight.range) .. "=".. vim.inspect(range_helper.range_to_matchpos(highlight.range)) .. " priority " .. tostring(highlight.priority))
+    self:_paint_range(highlight.name, range_helper.range_to_matchpos(highlight.range), highlight.priority)
   end
 end
 
@@ -112,7 +112,7 @@ function Painter:_build_highlights(buffer)
 end
 
 function Painter:_transpose_range_to_map(range, buffer)
-  return util.transpose_range(range, buffer.bufnr, self._.map.buffer.bufnr)
+  return range_helper.transpose_range(range, buffer.bufnr, self._.map.buffer.bufnr)
 end
 
 function Painter:_paint_range(group, pos, priority)

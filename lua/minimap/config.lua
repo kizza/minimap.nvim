@@ -6,10 +6,10 @@ local defaults = {
   map = {
     width = 10,
     painters = {
-      require("minimap.painters.viewport"),
-      require("minimap.painters.cursor"),
-      require("minimap.painters.git"),
-      require("minimap.painters.search"),
+      require("minimap.builtin.painters.viewport"),
+      require("minimap.builtin.painters.cursor"),
+      require("minimap.builtin.painters.git"),
+      require("minimap.builtin.painters.search"),
     },
     debounce = {
       build = 1000,
