@@ -1,12 +1,15 @@
 import assert from "assert";
-import { WithVim, delay, setBuffer, vimRunner } from "nvim-test-js";
-import * as path from "path";
+import { WithVim, delay, setBuffer } from "nvim-test-js";
 import buildHelpers from "./helpers";
 import withPlugin from "./helpers/vim";
 
 const withVim = (fn: WithVim) => withPlugin({
   map: {
-    width: 10
+    width: 10,
+    debounce: {
+      build: 0,
+      paint: 0,
+    }
   }
 }, fn)
 
@@ -82,19 +85,16 @@ describe("buffer management", () => {
         const { bufferCount, getMinimapText } = buildHelpers(nvim)
 
         await nvim.command('edit fixtures/buffer.txt');
-        // assert.equal(await getMinimapText(), '⠿⠿⠿⠛⠛⠛⠋⠉⠉⠉')
         assert.equal(await getMinimapText(), '⠟⠁        ')
         assert.equal(await bufferCount(), 1)
 
-        await delay(900) // Buffer order is by time, so need a slight delay
+        await delay(700) // Buffer history order is by time, so need a slight delay
 
         await nvim.command('edit fixtures/buffer_two.txt');
-        // assert.equal(await getMinimapText(), '⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿')
         assert.equal(await getMinimapText(), '⠿⠇        ')
         assert.equal(await bufferCount(), 2)
 
         await nvim.command('bdelete');
-        // assert.equal(await getMinimapText(), '⠿⠿⠿⠛⠛⠛⠋⠉⠉⠉')
         assert.equal(await getMinimapText(), '⠟⠁        ')
         assert.equal(await bufferCount(), 1)
       }));
@@ -107,12 +107,10 @@ describe("live updates", () => {
       const { getMinimapText } = buildHelpers(nvim)
 
       await nvim.command('edit fixtures/buffer.txt');
-      // assert.equal(await getMinimapText(), '⠿⠿⠿⠛⠛⠛⠋⠉⠉⠉')
       assert.equal(await getMinimapText(), '⠟⠁        ')
 
       await setBuffer(nvim, ['aaa', 'bbb', 'ccc'])
       await delay(10)
-      // assert.equal(await getMinimapText(), '⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿')
       assert.equal(await getMinimapText(), '⠿⠇        ')
     }));
 })

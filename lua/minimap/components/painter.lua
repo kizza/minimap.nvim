@@ -1,6 +1,5 @@
 local Object = require("nui.object")
 local Painter = Object("MinimapPainter")
-local Debounce = require("minimap.util.debounce")
 local util = require("minimap.util")
 
 function Painter:init(map, painters)
@@ -9,16 +8,12 @@ function Painter:init(map, painters)
     painters = painters,
     palettes = {},
     variants = {},
-    debouncer = Debounce(),
   }
 end
 
 function Painter:paint(name, palette, buffer)
   self._.palettes[name] = palette
-
-  self._.debouncer:run(10, function()
-    self:_paint(buffer)
-  end)
+  self:_paint(buffer)
 end
 
 function Painter:_paint(buffer)

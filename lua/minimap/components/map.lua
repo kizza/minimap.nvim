@@ -5,7 +5,6 @@ local Dispatcher = require("minimap.events.dispatcher")
 local Debounce = require("minimap.util.debounce")
 local const = require("minimap.const")
 local events = require("minimap.events")
-local util = require("minimap.util")
 
 ---@class Split
 ---@field bufnr number
@@ -20,13 +19,16 @@ function Map:init(config)
   self._ = {
     listeners = {},
     lines = {},
-    debouncer = Debounce(),
     builder = nil,
     painter = Painter(self, config.options.map.painters),
     namespace = vim.api.nvim_create_namespace("MinimapMap"),
     autogroup = {
       self = vim.api.nvim_create_augroup("MinimapMapEvents", { clear = true })
-    }
+    },
+    debouncers = {
+      paint = Debounce({ delay = config.options.map.debounce.paint }),
+      build = Debounce({ delay = config.options.map.debounce.build }),
+    },
   }
   self.buffer = nil
   self.winid = -1
@@ -42,7 +44,12 @@ function Map:build()
 end
 
 function Map:rebuild(...)
-  self._.builder:rebuild(...)
+  local bufnr = vim.api.nvim_get_current_buf()
+  self._.debouncers.build:run(function(...)
+    if vim.api.nvim_get_current_buf() == bufnr then
+      self._.builder:rebuild(...)
+    end
+  end)
 end
 
 -- Fixes size if/when misaligned
@@ -56,7 +63,7 @@ end
 
 function Map:repaint(reason)
   -- print("Repainting: " .. reason)
-  self._.debouncer:run(10, function()
+  self._.debouncers.paint:run(function()
     if self:valid() then
       self:emit(events.Repaint, self._.lines)
     end
@@ -84,7 +91,7 @@ function Map:_build_split()
       listchars = "trail: ",
       wrap = false,
       signcolumn = "no",
-      winhighlight = "Normal:MinimapNormal", -- ,CursorLine:MinimapCursorLine",
+      winhighlight = "Normal:MinimapNormal,CursorLine:MinimapCursorLine",
       scrolloff = 0,
       sidescrolloff = 0,
     }
@@ -92,7 +99,7 @@ function Map:_build_split()
 end
 
 function Map:_build_builder()
-  self._.builder = Builder({ window = self })
+  self._.builder = Builder({ map = self })
   self._.builder:on(events.Built, function() self:repaint("buffer rebuilt") end)
 end
 
@@ -112,7 +119,6 @@ function Map:show()
     return
   end
 
-  -- print("Showing window")
   self._.split:mount()
   self.winid = self._.split.winid
   self:_build_buffer()
@@ -142,28 +148,12 @@ end
 
 function Map:set_cursor_line(line)
   vim.api.nvim_win_set_cursor(self.winid, { line, 0 })
-
-  -- local extid = vim.api.nvim_buf_set_extmark(
-  --   self.buffer.bufnr,
-  --   self._.namespace,
-  --   line,
-  --   0,
-  --   {
-  --     -- end_col = 1,
-  --     hl_group = "Error",
-  --     sign_text = "T",
-  --     priority = 100,
-  --     sign_hl_group = "Function",
-  --     number_hl_group = "Type",
-  --     line_hl_group = "Error",
-  --   }
-  -- )
   self:repaint("cursor line set")
 end
 
 function Map:register_listeners()
   vim.api.nvim_create_autocmd(events.VimResized, {
-    callback = function() self:repaint("resized") end,
+    callback = function() self:_handle_resize() end,
     buffer = self.buffer.bufnr,
     group = self._.autogroup.self,
   })
@@ -186,6 +176,11 @@ end
 --   self:emit(events.RowChanged, current_line)
 --   self:repaint("map scrolling")
 -- end
+
+function Map:_handle_resize()
+  self:size()
+  self:repaint("resized")
+end
 
 function Map:_handle_buffer_deleted()
   -- print("MY BUFFER WAS DELETED! " .. self.buffer.name)

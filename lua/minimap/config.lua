@@ -6,11 +6,15 @@ local defaults = {
   map = {
     width = 10,
     painters = {
-      -- require("minimap.painters.viewport"),
-      -- require("minimap.painters.cursor"),
-      -- require("minimap.painters.git"),
+      require("minimap.painters.viewport"),
+      require("minimap.painters.cursor"),
+      require("minimap.painters.git"),
       require("minimap.painters.search"),
     },
+    debounce = {
+      build = 1000,
+      paint = 50,
+    }
   },
   ignored = {
     buf_types = { "nofile", "nowrite", "quickfix", "terminal", "help", "prompt", "NvimTree" },

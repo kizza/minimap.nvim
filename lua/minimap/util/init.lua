@@ -51,8 +51,7 @@ function M.range_to_matchpos(range)
     return { start.line }
   else
     -- line, column start, length (does not support multiple line positions)
-    local length_in_bytes = (stop.column - start.column)
-    return { { start.line, start.column, length_in_bytes } }
+    return { { start.line, start.column, (stop.column - start.column) } }
   end
 end
 
@@ -68,7 +67,6 @@ local function get_line_length(bufnr, line_number)
   local lines = vim.api.nvim_buf_get_lines(bufnr, line_number - 1, line_number, false)
   -- Check if the line was successfully retrieved
   if lines[1] then
-    print("Lines for buf " .. tostring(bufnr) .. " = " .. M.trim_trailing_whitespace(lines[1]))
     return string.len(M.trim_trailing_whitespace(lines[1]))
   else
     return 0
@@ -90,7 +88,11 @@ local function transpose_line(line, source, destination)
 end
 
 local function round_down_to_nearest(number, factor)
-    return math.floor(number / factor) * factor
+  return math.floor(number / factor) * factor
+end
+
+local function round_up_to_nearest(number, factor)
+  return math.ceil(number / factor) * factor
 end
 
 local function transpose_column(column, source, source_line, destination, destination_line, purpose)
@@ -101,14 +103,13 @@ local function transpose_column(column, source, source_line, destination, destin
   local transposed = source_ratio * destination_line_length
   local rounded = M.round(transposed)
   if purpose == "start" then
-    -- rounded = math.floor(round_down_to_nearest(math.floor(transposed), 3))
-    rounded = math.max(1, math.floor(transposed))
     rounded = math.max(1, round_down_to_nearest(transposed, 3))
   else
-    rounded = math.ceil(transposed)
+    rounded = math.min(destination_line_length, round_up_to_nearest(math.ceil(transposed), 3))
   end
 
   local debug = {
+    "column=" .. column,
     "source_line_length=" .. source_line_length,
     "source_ratio=" .. source_ratio,
     "destination_line_length=" .. destination_line_length,
@@ -116,7 +117,9 @@ local function transpose_column(column, source, source_line, destination, destin
     "rounded=" .. rounded,
     "purpose=" .. purpose,
   }
-  print("Debug column: " .. table.concat(debug, ", "))
+  -- if purpose == "stop" then
+  -- print("Debug column: " .. table.concat(debug, ", "))
+  -- end
 
   if column > source_line_length then
     return destination_line_length
@@ -134,7 +137,8 @@ function M.transpose_position(raw_position, source, destination, purpose)
   end
 
   -- Ensure we pass in the *original* (not transposed) line
-  local transposed_column = transpose_column(position.column, source, position.line, destination, transposed_line, purpose)
+  local transposed_column = transpose_column(position.column, source, position.line, destination, transposed_line,
+    purpose)
   return { line = transposed_line, column = transposed_column }
 end
 
@@ -154,13 +158,10 @@ end
 -- end
 
 function M.transpose_range(range, source, destination)
-  print("Transposing range " .. vim.inspect(range))
-  local result = {
+  return {
     M.transpose_position(range[1], source, destination, "start"),
     M.transpose_position(range[2], source, destination, "stop"),
   }
-  print("..to .." .. vim.inspect(result))
-  return result
 end
 
 function M.get_previous_buffers()

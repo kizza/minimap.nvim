@@ -5,6 +5,14 @@ vim.cmd [[
   hi MinimapAdded ctermfg=green
   hi MinimapChanged ctermfg=magenta
   hi MinimapRemoved ctermfg=red
+
+  hi MinimapAddedViewport ctermfg=green ctermbg=18
+  hi MinimapChangedViewport ctermfg=magenta ctermbg=18
+  hi MinimapRemovedViewport ctermfg=red ctermbg=18
+
+  hi MinimapAddedCursorLine ctermfg=green ctermbg=19
+  hi MinimapChangedCursorLine ctermfg=magenta ctermbg=19
+  hi MinimapRemovedCursorLine ctermfg=red ctermbg=19
 ]]
 
 local function build_git_palette(hunks)
@@ -27,7 +35,6 @@ local function build_git_palette(hunks)
         }
       })
     elseif (hunk.type == "change") then
-      print(vim.inspect(hunk))
       local start = math.min(hunk.added.start, hunk.removed.start)
       local count = hunk.added.count - 1
 

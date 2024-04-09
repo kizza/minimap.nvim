@@ -8,8 +8,10 @@ local util = require("minimap.util")
 local M = {}
 
 function M.setup(options)
-  vim.g.loaded_minimap = true
-  M.run(options or {})
+  if not vim.g.loaded_minimap then
+    vim.g.loaded_minimap = true
+    M.run(options or {})
+  end
 end
 
 function M.run(options)
@@ -84,8 +86,7 @@ end
 
 function M.create_default_highlights()
   vim.cmd [[
-    " hi MinimapNormal ctermfg=19 ctermbg=0
-    hi MinimapNormal ctermfg=7 " ctermbg=0
+    hi MinimapNormal ctermfg=7
   ]]
 end
 

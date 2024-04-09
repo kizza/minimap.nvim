@@ -5,7 +5,11 @@ import withPlugin from "./helpers/vim";
 
 const withVim = (fn: WithVim) => withPlugin({
   map: {
-    width: 12
+    width: 12,
+    debounce: {
+      build: 0,
+      paint: 0,
+    }
   }
 }, fn)
 
@@ -34,7 +38,7 @@ describe("search highlighting", () => {
       matches = await getMinimapMatches()
       searchHighlights = matches.filter(match => match.group.startsWith("MinimapSearch"))
       assert.equal(searchHighlights.length, 3)
-      assert.equal(JSON.stringify(searchHighlights[0].pos1), "[1,1,4]")
+      assert.equal(JSON.stringify(searchHighlights[0].pos1), "[1,1,5]")
       assert.equal(JSON.stringify(searchHighlights[1].pos1), "[2,15,6]")
       assert.equal(JSON.stringify(searchHighlights[2].pos1), "[3,30,6]")
     }));

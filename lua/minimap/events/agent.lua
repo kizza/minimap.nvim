@@ -32,7 +32,7 @@ function Agent:register_listeners()
 
   vim.api.nvim_create_autocmd(events.CmdLineLeave, {
     callback = function()
-      print("Doing the search")
+      -- print("Doing the search")
       if vim.fn.expand('<afile>') == "/" or vim.fn.expand('<afile>') == "?" then
         vim.g.minimap_search_term = vim.fn.getcmdline()
       end
