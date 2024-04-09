@@ -1,7 +1,13 @@
 local util = require("minimap.util")
 
+--- @alias Position { line: number, column: nil | number }
+--- @alias Range Position
+--- @alias Matchpos number[]
+--
 local M = {}
 
+--- @param position number[]
+--- @return Position
 local function parse_position(position)
   local entire_line = { line = position }
   if type(position) ~= "table" then return entire_line end
@@ -9,6 +15,9 @@ local function parse_position(position)
   return { line = position[1], column = position[2] }
 end
 
+--- @param bufnr number
+--- @param line_number number
+--- @return number
 local function get_line_length(bufnr, line_number)
   -- nvim_buf_get_lines is 0-indexed for line numbers, so subtract 1 from the line_number
   local lines = vim.api.nvim_buf_get_lines(bufnr, line_number - 1, line_number, false)
@@ -20,6 +29,10 @@ local function get_line_length(bufnr, line_number)
   end
 end
 
+--- @param line number
+--- @param source number
+--- @param destination number
+--- @return number
 local function transpose_line(line, source, destination)
   local source_line_count = vim.api.nvim_buf_line_count(source)
   local source_scroll_ratio = line / source_line_count
@@ -34,14 +47,27 @@ local function transpose_line(line, source, destination)
   end
 end
 
+--- @param number number
+--- @param factor number
+--- @return number
 local function round_down_to_nearest(number, factor)
   return math.floor(number / factor) * factor
 end
 
+--- @param number number
+--- @param factor number
+--- @return number
 local function round_up_to_nearest(number, factor)
   return math.ceil(number / factor) * factor
 end
 
+--- @param column number
+--- @param source number
+--- @param source_line number
+--- @param destination number
+--- @param destination_line number
+--- @param purpose "start" | "stop"
+--- @return number
 local function transpose_column(column, source, source_line, destination, destination_line, purpose)
   local source_line_length = get_line_length(source, source_line)
   local source_ratio = column / source_line_length
@@ -75,10 +101,14 @@ local function transpose_column(column, source, source_line, destination, destin
   end
 end
 
+--- @param i number: line index
+--- @param range Range: the buffer range
 function M.within_range(i, range)
   return i >= range[1].line and i <= range[2].line
 end
 
+--- @param range Range
+--- @return Matchpos
 function M.range_to_matchpos(range)
   local start = range[1]
   local stop = range[2]
@@ -91,6 +121,11 @@ function M.range_to_matchpos(range)
   end
 end
 
+--- @param raw_position number[]
+--- @param source number
+--- @param destination number
+--- @param purpose "start" | "stop"
+--- @return Position
 function M.transpose_position(raw_position, source, destination, purpose)
   local position = parse_position(raw_position)
   local transposed_line = transpose_line(position.line, source, destination)
@@ -105,6 +140,10 @@ function M.transpose_position(raw_position, source, destination, purpose)
   return { line = transposed_line, column = transposed_column }
 end
 
+--- @param range Range
+--- @param source number
+--- @param destination number
+--- @return Range
 function M.transpose_range(range, source, destination)
   return {
     M.transpose_position(range[1], source, destination, "start"),

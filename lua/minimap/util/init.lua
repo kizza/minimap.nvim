@@ -23,10 +23,8 @@ function M.trim_trailing_whitespace(text)
 end
 
 function M.merge_tables(first_table, second_table)
-  -- for k, v in pairs(second_table) do first_table[k] = v end
   for k, v in pairs(second_table) do
     if type(v) == "table" then
-      -- first_table[k] = first_table[k] or {}
       first_table[k] = M.merge_tables(first_table[k], v)
     else
       first_table[k] = v

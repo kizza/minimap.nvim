@@ -8,7 +8,6 @@ function Agent:init(map, config)
   self._ = {
     listeners = {},
     map = map,
-    painters = config.options.map.painters,
     registered_buffer = nil,
     autogroup = {
       buffers = vim.api.nvim_create_augroup("MinimapAgent", { clear = true })
@@ -39,36 +38,6 @@ function Agent:register_listeners()
     end,
     group = self._.autogroup.buffers,
   })
-
-  -- self._.map:on(events.Repaint, function()
-  --   -- print("Applying paint")
-  --   self:_repaint()
-  -- end)
-end
-
-function Agent:restore_preivous_buffer()
-  local previous_buffers = util.get_previous_buffers()
-  -- print("Previous buffers " .. vim.inspect(previous_buffers))
-  -- print(vim.inspect(vim.api.nvim_command_output("ls t")))
-  if previous_buffers[1] ~= tostring(vim.fn.bufnr()) then
-    -- TODO use nvim_win_open with split attribute when available
-    local restored_buffer = Buffer({ bufnr = tonumber(previous_buffers[2]) })
-    local restore_position = "topleft vertical"
-    local restore_width = vim.fn.winwidth(vim.fn.winnr()) - self._.map.width
-    local restore_cmd = restore_position .. " " .. restore_width .. 'split #' .. restored_buffer.bufnr
-    vim.cmd(restore_cmd)
-
-    self:emit(events.BufferActive, restored_buffer)
-  else
-    -- print("Closing")
-    self._.map:close()
-  end
-end
-
-function Agent:_register_painters()
-  for _, painter in ipairs(self._.painters) do
-    painter.register(self._.registered_buffer, self._.map)
-  end
 end
 
 function Agent:register_mapped_buffer(buffer)
@@ -83,11 +52,18 @@ function Agent:register_mapped_buffer(buffer)
     return false
   end
 
+  -- Setup buffer
+  buffer:register_listeners({
+    events.RowChanged,
+    events.WinScrolled,
+    events.BufferChanged,
+    events.BufUnload,
+  })
+
+  -- Setup map
   self._.map:size()
   self._.registered_buffer = buffer
-  self._.map:clear_listeners()
-  self:_register_painters()
-  self._.map:on(events.RowChanged, function(line) self:sync_buffer_row(line) end)
+  self._.map:clear_listeners() -- ready for new painters
   return true
 end
 

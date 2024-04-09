@@ -1,9 +1,7 @@
 local Agent = require("minimap.events.agent")
 local Config = require("minimap.config")
-local Buffer = require("minimap.components.buffer")
 local Map = require("minimap.components.map")
 local events = require("minimap.events")
-local range_helper = require("minimap.util.range")
 
 local M = {}
 
@@ -33,46 +31,15 @@ function M.run(options)
     end
 
     if agent:register_mapped_buffer(buffer) then
-      buffer:register_listeners({
-        events.RowChanged,
-        events.WinScrolled,
-        events.RebuildRequired,
-        events.BufUnload,
-      })
+      for _, painter in ipairs(config.options.map.painters) do
+        painter.register(buffer, map)
+      end
 
       map:show()
 
-      buffer:on(events.RebuildRequired, function()
-        map:rebuild()
-      end)
-
-      buffer:on(events.WinScrolled, function()
-        map:repaint("scrolled")
-      end)
-
-      buffer:on(events.BufUnload, function()
-        local current = Buffer({ bufnr = vim.fn.bufnr() })
-
-        -- We've fallen into the minimap, open previous buffer
-        if current.filetype == "minimap" then
-          -- print("Current buffer is minimap")
-          agent:restore_preivous_buffer()
-        else
-          -- print("Not in minimap")
-          map:close()
-        end
-      end)
-
-      buffer:on(events.RowChanged, function(row)
-        if not map:valid() then
-          print("Rowchanged in scrolling, but map is not valid")
-          return
-        end
-
-        map:set_cursor_line(
-          range_helper.transpose_position(row, buffer.bufnr, map.buffer.bufnr).line
-        )
-      end)
+      for _, behavior in ipairs(config.options.behaviors) do
+        behavior.register(buffer, agent, map)
+      end
     end
   end)
 

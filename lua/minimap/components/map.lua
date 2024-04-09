@@ -35,12 +35,12 @@ function Map:init(config)
   self.width = config.options.map.width
 
   self:_build_split()
-  self:_build_builder()
+  self:_build_builder(config.options.map.builder)
 end
 
 function Map:build()
-  self._.builder:build()
   self:size()
+  self._.builder:build()
 end
 
 function Map:rebuild(...)
@@ -91,15 +91,15 @@ function Map:_build_split()
       listchars = "trail: ",
       wrap = false,
       signcolumn = "no",
-      winhighlight = "Normal:MinimapNormal,CursorLine:MinimapCursorLine",
+      winhighlight = "Normal:MinimapNormal", -- ,CursorLine:MinimapCursorLine",
       scrolloff = 0,
       sidescrolloff = 0,
     }
   })
 end
 
-function Map:_build_builder()
-  self._.builder = Builder({ map = self })
+function Map:_build_builder(builder)
+  self._.builder = Builder({ map = self, builder = builder })
   self._.builder:on(events.Built, function() self:repaint("buffer rebuilt") end)
 end
 
@@ -154,7 +154,7 @@ end
 function Map:register_listeners()
   vim.api.nvim_create_autocmd(events.VimResized, {
     callback = function() self:_handle_resize() end,
-    buffer = self.buffer.bufnr,
+    -- buffer = self.buffer.bufnr,
     group = self._.autogroup.self,
   })
 

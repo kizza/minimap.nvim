@@ -2,7 +2,7 @@ local events = {
   BufferActive = "BufferActive",
   MinimapActive = "MinimapActive",
   RowChanged = "RowChanged",
-  RebuildRequired = "RebuildRequired",
+  BufferChanged = "BufferChanged",
   Built = "Built",
   Repaint = "Repaint",
 

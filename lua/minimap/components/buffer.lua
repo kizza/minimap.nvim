@@ -39,9 +39,9 @@ function Buffer:register_listeners(listeners)
     })
   end
 
-  if util.contains(listeners, events.RebuildRequired) then
+  if util.contains(listeners, events.BufferChanged) then
     vim.api.nvim_create_autocmd({ events.TextChanged, events.TextChangedI, events.InsertLeave }, {
-      callback = function() self:emit(events.RebuildRequired, self) end,
+      callback = function() self:emit(events.BufferChanged, self) end,
       buffer = self.bufnr,
       -- group = self._.autogroup.self,
     })
