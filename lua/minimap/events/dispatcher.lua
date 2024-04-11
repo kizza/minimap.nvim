@@ -1,4 +1,7 @@
 local Object = require("nui.object")
+
+--- @class Dispatcher
+--- @param extend function
 local Dispatcher = Object("MinimapDispatcher")
 
 function Dispatcher:init()

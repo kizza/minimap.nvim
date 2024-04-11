@@ -1,7 +1,7 @@
 {
   "name": "minimap.nvim",
   "version": "0.0.1",
-  "description": "Blazing fast minimap for vim, powered by code-minimap written in Rust",
+  "description": "Blazing fast minimap for neovim, powered by code-minimap written in Rust",
   "main": "index.js",
   "repository": "git@github.com:kizza/minimap.nvim.git",
   "author": "Kizza",

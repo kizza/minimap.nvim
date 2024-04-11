@@ -2,6 +2,7 @@ local Agent = require("minimap.events.agent")
 local Config = require("minimap.config")
 local Map = require("minimap.components.map")
 local events = require("minimap.events")
+local debug = require("minimap.util.debug")
 
 local M = {}
 
@@ -24,9 +25,14 @@ function M.run(options)
     map:repaint()
   end, {})
 
+  -- To debug
+  vim.api.nvim_create_user_command("MinimapDebug", function()
+    debug.enable()
+  end, {})
+
   agent:on(events.BufferActive, function(buffer)
     if config:ignored(buffer) then
-      -- map:hide()
+      -- No action yet
       return
     end
 
@@ -44,10 +50,7 @@ function M.run(options)
   end)
 
   agent:on(events.MinimapActive, function(buffer)
-    if #vim.api.nvim_list_wins() == 1 then
-      -- print("Minimap last window!")
-      -- vim.cmd("quit")
-    end
+    -- No action yet
   end)
 end
 

@@ -5,6 +5,11 @@ local M = {}
 
 function M.register(buffer, agent, map)
   buffer:on(events.RowChanged, function(row)
+    if not map:valid() then
+      print("RowChanged from buffer " .. buffer.name .. ", but map is not valid")
+      return
+    end
+
     map:set_cursor_line(
       range_helper.transpose_position(row, buffer.bufnr, map.buffer.bufnr).line
     )

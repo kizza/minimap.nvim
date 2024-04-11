@@ -3,7 +3,13 @@ local Buffer = Dispatcher:extend("MinimapBuffer")
 local const = require("minimap.const")
 local events = require("minimap.events")
 local util = require("minimap.util")
+local debug = require("minimap.util.debug")
 
+--- @class Buffer
+--- @field bufnr number
+--- @field name string
+--- @field filetype string
+--- @field buftype string
 function Buffer:init(options)
   options = options or {}
   local bufnr = options.bufnr or vim.api.nvim_get_current_buf()
@@ -11,9 +17,6 @@ function Buffer:init(options)
   self._ = {
     listeners = {},
     last_cursor_y = -1,
-    autogroup = {
-      self = vim.api.nvim_create_augroup("MinimapBuffer", { clear = true })
-    }
   }
 
   self.bufnr = bufnr
@@ -22,12 +25,14 @@ function Buffer:init(options)
   self.name = vim.api.nvim_buf_get_name(bufnr)
 end
 
-function Buffer:register_listeners(listeners)
+function Buffer:register_listeners(augroup_name, listeners)
+  local augroup = vim.api.nvim_create_augroup(augroup_name, { clear = true })
+
   if util.contains(listeners, events.RowChanged) then
     vim.api.nvim_create_autocmd({ events.CursorMoved, events.CursorMovedI }, {
       callback = function() self:_row_changed_handler() end,
       buffer = self.bufnr,
-      -- group = self._.autogroup.self,
+      group = augroup,
     })
   end
 
@@ -35,7 +40,7 @@ function Buffer:register_listeners(listeners)
     vim.api.nvim_create_autocmd(events.WinScrolled, {
       callback = function() self:emit(events.WinScrolled, self) end,
       buffer = self.bufnr,
-      -- group = self._.autogroup.self,
+      group = augroup,
     })
   end
 
@@ -43,7 +48,7 @@ function Buffer:register_listeners(listeners)
     vim.api.nvim_create_autocmd({ events.TextChanged, events.TextChangedI, events.InsertLeave }, {
       callback = function() self:emit(events.BufferChanged, self) end,
       buffer = self.bufnr,
-      -- group = self._.autogroup.self,
+      group = augroup,
     })
   end
 
@@ -51,7 +56,7 @@ function Buffer:register_listeners(listeners)
     vim.api.nvim_create_autocmd(events.BufUnload, {
       callback = function() self:emit(events.BufUnload, self) end,
       buffer = self.bufnr,
-      -- group = self._.autogroup.self,
+      group = augroup,
     })
   end
 end
@@ -75,14 +80,6 @@ function Buffer:get_cursor_line()
   return vim.api.nvim_win_get_cursor(window)[1]
 end
 
--- function Buffer:set_cursor_line(line)
---   print("setting " .. line .. " with " .. self:get_window())
---   local window = self:get_window()
---   if window and vim.api.nvim_win_is_valid(window) then
---     vim.api.nvim_win_set_cursor(window, { line, 0 })
---   end
--- end
-
 function Buffer:get_window()
   local windows_for_buffer = {}
   local all_windows = vim.api.nvim_list_wins()
@@ -94,14 +91,16 @@ function Buffer:get_window()
   return windows_for_buffer[1]
 end
 
-function Buffer:print()
-  local debug = {
+function Buffer:debug(message)
+  if not debug.enabled() then return nil end
+
+  local logs = {
     "bufnr=" .. self.bufnr,
     "buftype=" .. self.buftype,
     "filetype=" .. self.filetype,
     "name=" .. self.name,
   }
-  print("Debug buffer: " .. table.concat(debug, ", "))
+  print((message or "Debug buffer") .. ": " .. table.concat(logs, ", "))
 end
 
 return Buffer

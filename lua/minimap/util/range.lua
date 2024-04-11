@@ -124,7 +124,7 @@ end
 --- @param raw_position number[]
 --- @param source number
 --- @param destination number
---- @param purpose "start" | "stop"
+--- @param purpose nil | "start" | "stop"
 --- @return Position
 function M.transpose_position(raw_position, source, destination, purpose)
   local position = parse_position(raw_position)

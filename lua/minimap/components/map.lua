@@ -8,11 +8,22 @@ local events = require("minimap.events")
 
 ---@class Split
 ---@field bufnr number
+---@field winid number
+---@field mount function
+---@field unmount function
 local Split = require("nui.split")
 
----@class Map
+---@class internal
+---@field lines string[]
+---@field split? Split
+---@field builder? Builder
+---@field painter Painter
+
+---@class Map: Dispatcher
 ---@field bufnr number
----@field emit function
+---@field winid number
+---@field width number
+---@field private _ internal
 local Map = Dispatcher:extend("MinimapWindow")
 
 function Map:init(config)

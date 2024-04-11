@@ -32,6 +32,8 @@ function Config:init(options)
   self.options = util.merge_tables(defaults, options)
 end
 
+--- @param buffer Buffer
+--- @return boolean
 function Config:ignored(buffer)
   local ignored_by_buf_type = util.contains(self.options.ignored.buf_types, buffer.buftype)
   local ignored_by_file_type = util.contains(self.options.ignored.file_types, buffer.filetype)

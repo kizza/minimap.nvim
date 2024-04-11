@@ -1,6 +1,8 @@
 local Object = require("nui.object")
-local Painter = Object("MinimapPainter")
 local range_helper = require("minimap.util.range")
+
+---@class Painter
+local Painter = Object("MinimapPainter")
 
 function Painter:init(map, painters)
   self._ = {

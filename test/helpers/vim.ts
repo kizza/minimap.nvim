@@ -10,7 +10,7 @@ export interface PluginOptions {
 
 export default (options: Partial<PluginOptions> | Object, fn: WithVim) =>
   vimRunner({
-    vimrc: path.resolve(__dirname, "../vimrc_without_plugin.vim"),
+    vimrc: path.resolve(__dirname, "../vimrc.vim"),
   })(async nvim =>
     nvim
       .executeLua(`require("minimap").setup(${stringify(options)})`)

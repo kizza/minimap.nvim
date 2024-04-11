@@ -1,7 +1,7 @@
 local Buffer = require("minimap.components.buffer")
 local Dispatcher = require("minimap.events.dispatcher")
 local events = require("minimap.events")
-local util = require("minimap.util")
+local debug = require("minimap.util.debug")
 local Agent = Dispatcher:extend("MinimapAgent")
 
 function Agent:init(map, config)
@@ -43,7 +43,7 @@ end
 function Agent:register_mapped_buffer(buffer)
   local already_registered = self._.registered_buffer and self._.registered_buffer.bufnr == buffer.bufnr
   if already_registered then
-    -- print("already registered " .. buffer.name)
+    buffer:debug("Already registered")
     if not self._.map:valid() then
       print("Yes, there is a problem, the window isn't open")
       self._.map:hide()
@@ -52,8 +52,10 @@ function Agent:register_mapped_buffer(buffer)
     return false
   end
 
+  buffer:debug("Registering buffer")
+
   -- Setup buffer
-  buffer:register_listeners({
+  buffer:register_listeners("MinimappedBuffer", {
     events.RowChanged,
     events.WinScrolled,
     events.BufferChanged,

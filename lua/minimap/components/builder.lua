@@ -2,7 +2,7 @@ local Cache = require("minimap.util.cache")
 local Dispatcher = require("minimap.events.dispatcher")
 local events = require("minimap.events")
 
----@class Build
+---@class Builder
 ---@field build function
 local Builder = Dispatcher:extend("MinimapBuilder")
 
