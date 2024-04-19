@@ -5,6 +5,8 @@ local Dispatcher = require("minimap.events.dispatcher")
 local Debounce = require("minimap.util.debounce")
 local const = require("minimap.const")
 local events = require("minimap.events")
+local debug = require("minimap.debug")
+local Log = require("minimap.debug.log")
 
 ---@class Split
 ---@field bufnr number
@@ -18,6 +20,7 @@ local Split = require("nui.split")
 ---@field split? Split
 ---@field builder? Builder
 ---@field painter Painter
+---@field debouncers: { build: Debounce, paint: Debounce }
 
 ---@class Map: Dispatcher
 ---@field bufnr number
@@ -37,8 +40,8 @@ function Map:init(config)
       self = vim.api.nvim_create_augroup("MinimapMapEvents", { clear = true })
     },
     debouncers = {
-      paint = Debounce({ delay = config.options.map.debounce.paint }),
       build = Debounce({ delay = config.options.map.debounce.build }),
+      paint = Debounce({ delay = config.options.map.debounce.paint }),
     },
   }
   self.buffer = nil
@@ -120,8 +123,17 @@ function Map:_build_buffer()
 end
 
 function Map:valid()
+  -- if debug.enabled() then
+  --   Log({
+  --     "map:valid()?",
+  --     "self.winid=" .. self.winid,
+  --     "nvim_win_is_valid=" .. tostring(vim.api.nvim_win_is_valid(self.winid)),
+  --     "nvim_buf_is_valid=" .. tostring(vim.api.nvim_buf_is_valid(self.buffer.bufnr)),
+  --   }):write()
+  -- end
+
   if not self.winid then return false end
-  return vim.api.nvim_win_is_valid(self.winid) and vim.api.nvim_buf_is_valid(self.buffer.bufnr)
+  return vim.api.nvim_win_is_valid(self.winid) -- and vim.api.nvim_buf_is_valid(self.buffer.bufnr)
 end
 
 function Map:show()
@@ -166,6 +178,15 @@ function Map:register_listeners()
   vim.api.nvim_create_autocmd(events.VimResized, {
     callback = function() self:_handle_resize() end,
     -- buffer = self.buffer.bufnr,
+    group = self._.autogroup.self,
+  })
+
+  vim.api.nvim_create_autocmd(events.WinClosed, {
+    callback = function(args)
+      if args.match ~= tostring(self.winid) then return end
+      self._.split:unmount()
+      self:emit(events.MinimapClosed)
+    end,
     group = self._.autogroup.self,
   })
 

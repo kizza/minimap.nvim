@@ -18,6 +18,10 @@ function M.contains(tbl, x)
   return found
 end
 
+function M.split(text)
+  return text:gmatch("[^\r\n]+")
+end
+
 function M.trim_trailing_whitespace(text)
   return string.gsub(text, "([^%s]+)%s*$", "%1")
 end

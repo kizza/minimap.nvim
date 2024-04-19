@@ -2,7 +2,8 @@ local Agent = require("minimap.events.agent")
 local Config = require("minimap.config")
 local Map = require("minimap.components.map")
 local events = require("minimap.events")
-local debug = require("minimap.util.debug")
+local debug = require("minimap.debug")
+local Log = require("minimap.debug.log")
 
 local M = {}
 
@@ -28,6 +29,12 @@ function M.run(options)
   -- To debug
   vim.api.nvim_create_user_command("MinimapDebug", function()
     debug.enable()
+    vim.api.nvim_create_augroup("DebugGroup", { clear = true })
+    for _, autocmd in pairs(
+      { "WinNew", "BufWinEnter", "WinEnter", "BufEnter", "BufAdd", "BufWinLeave", "WinLeave", "WinClosed", "BufUnload", "BufDelete", "VimResized", "BufWrite" }
+    ) do
+      vim.api.nvim_create_autocmd(autocmd, { group = "DebugGroup", callback = function() debug.autocmd(autocmd) end })
+    end
   end, {})
 
   agent:on(events.BufferActive, function(buffer)

@@ -1,7 +1,7 @@
 local Buffer = require("minimap.components.buffer")
 local Dispatcher = require("minimap.events.dispatcher")
 local events = require("minimap.events")
-local debug = require("minimap.util.debug")
+local debug = require("minimap.debug")
 local Agent = Dispatcher:extend("MinimapAgent")
 
 function Agent:init(map, config)
@@ -46,8 +46,11 @@ function Agent:register_mapped_buffer(buffer)
     buffer:debug("Already registered")
     if not self._.map:valid() then
       print("Yes, there is a problem, the window isn't open")
-      self._.map:hide()
-      self._.map:show()
+      -- local restore = function()
+        self._.map:hide()
+        self._.map:show()
+      -- end
+      -- vim.schedule_wrap(function () restore() end)
     end
     return false
   end
@@ -66,7 +69,17 @@ function Agent:register_mapped_buffer(buffer)
   self._.map:size()
   self._.registered_buffer = buffer
   self._.map:clear_listeners() -- ready for new painters
+
+  -- self._.map:on(events.MinimapClosed, function()
+  --   self:_shut_it_down()
+  -- end)
   return true
+end
+
+function Agent:_shut_it_down()
+  print("shut it down")
+  self._.registered_buffer:clear_listeners()
+  self._.map:clear_listeners()
 end
 
 -- function Agent:sync_buffer_row(map_line)

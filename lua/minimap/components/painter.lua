@@ -20,7 +20,7 @@ end
 
 function Painter:_paint(buffer)
   if not self._.map:valid() then
-    print("Unable to paint " .. buffer.name)
+    -- print("Unable to paint " .. buffer.name)
     return
   end
 

@@ -1,4 +1,6 @@
 import assert from "assert";
+import * as path from "path";
+import fs from "fs";
 import { WithVim, delay, setBuffer } from "nvim-test-js";
 import buildHelpers from "./helpers";
 import withPlugin from "./helpers/vim";
@@ -128,25 +130,3 @@ describe("painting", () => {
       assert.equal(matches[1].group, "MinimapCursorLine")
     }));
 })
-  // describe("amongst other floating windows", () => {
-  //   const openFloat = (nvim: NeovimClient) =>
-  //     nvim.commandOutput(
-  //       "call nvim_open_win(nvim_create_buf(v:false, v:true), 1, {'relative':'editor','row':10,'col':10,'width':80,'height':10})",
-  //     )
-
-  //   it("returns to the previous buffer", () =>
-  //     withVim(async nvim => {
-  //       const { get, getMinimapText } = buildHelpers(nvim)
-  //       assert.equal(await get('winnr("$")'), "1")
-
-  //       await openFloat(nvim)
-  //       assert.equal(await get('winnr("$")'), "2")
-
-  //       await nvim.command('edit fixtures/buffer.txt');
-  //       assert.equal(await get('expand("%")'), 'fixtures/buffer.txt')
-  //       assert.equal(await getMinimapText(), '⠿⠿⠿⠛⠛⠛⠋⠉⠉⠉')
-
-  //       const test = await get("tabpagewinnr(tabpagenr(), '$')")
-  //       console.log(test)
-  //     }))
-  // })

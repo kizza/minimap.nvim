@@ -1,13 +1,16 @@
 local util = require("minimap.util")
 local events = require("minimap.events")
-local debug = require("minimap.util.debug")
+local debug = require("minimap.debug")
 local Buffer = require("minimap.components.buffer")
+local Log = require("minimap.debug.log")
 local M = {}
 
 local function restore_preivous_buffer(agent, map)
+  -- if true then return nil end
   local previous_buffers = util.get_previous_buffers()
 
-  debug.print("Previous buffers " ..
+  local log = Log("Restore previous buffer")
+  log:append("Previous buffers " ..
     vim.inspect(previous_buffers) .. "\n" .. vim.inspect(vim.api.nvim_command_output("ls t")))
 
   if previous_buffers[1] ~= tostring(vim.fn.bufnr()) then
@@ -16,14 +19,20 @@ local function restore_preivous_buffer(agent, map)
     local restore_position = "topleft vertical"
     local restore_width = vim.fn.winwidth(vim.fn.winnr()) - map.width
     local restore_cmd = restore_position .. " " .. restore_width .. 'split #' .. restored_buffer.bufnr
-    debug.print("Restoring with " .. restore_cmd)
+    log:append("Restoring with " .. restore_cmd)
     vim.cmd(restore_cmd)
+
+    -- Restore broken window elements
+    vim.opt.signcolumn = "yes"
+    vim.opt.number = true
 
     agent:emit(events.BufferActive, restored_buffer)
   else
-    util.debug("Closing map")
+    log:append("Closing map")
     map:close()
   end
+
+  if debug.enabled() then log:write() end
 end
 
 function M.register(buffer, agent, map)

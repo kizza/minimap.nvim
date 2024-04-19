@@ -1,4 +1,6 @@
 local Object = require("nui.object")
+
+--- @class Debounce
 local Debounce = Object("MinimapCache")
 
 function Debounce:init(options)

@@ -3,7 +3,8 @@ local Buffer = Dispatcher:extend("MinimapBuffer")
 local const = require("minimap.const")
 local events = require("minimap.events")
 local util = require("minimap.util")
-local debug = require("minimap.util.debug")
+local debug = require("minimap.debug")
+local Log = require("minimap.debug.log")
 
 --- @class Buffer
 --- @field bufnr number
@@ -95,12 +96,13 @@ function Buffer:debug(message)
   if not debug.enabled() then return nil end
 
   local logs = {
+    (message or "Debug buffer"),
     "bufnr=" .. self.bufnr,
     "buftype=" .. self.buftype,
     "filetype=" .. self.filetype,
     "name=" .. self.name,
   }
-  print((message or "Debug buffer") .. ": " .. table.concat(logs, ", "))
+  Log(logs):write()
 end
 
 return Buffer
