@@ -69,6 +69,19 @@ describe("buffer management", () => {
         assert.equal(await get('winnr("$")'), "1")
       }));
 
+    it("reopens when opening a new buffer after closed", () =>
+      withVim(async nvim => {
+        const { get, withinMinimap } = buildHelpers(nvim)
+
+        await nvim.command('edit fixtures/buffer.txt');
+
+        await withinMinimap(() =>nvim.command('bdelete'))
+        assert.equal(await get('winnr("$")'), "1")
+
+        await nvim.command('edit fixtures/buffer_two.txt');
+        assert.equal(await get('winnr("$")'), "2")
+      }));
+
     // it("quites when the last buffer is quit", () =>
     //   withVim(async nvim => {
     //     const { get } = buildHelpers(nvim)

@@ -45,12 +45,9 @@ function Agent:register_mapped_buffer(buffer)
   if already_registered then
     buffer:debug("Already registered")
     if not self._.map:valid() then
-      print("Yes, there is a problem, the window isn't open")
-      -- local restore = function()
-        self._.map:hide()
-        self._.map:show()
-      -- end
-      -- vim.schedule_wrap(function () restore() end)
+      -- print("Yes, there is a problem, the window isn't open")
+      self._.map:hide()
+      self._.map:show()
     end
     return false
   end
