@@ -25,8 +25,14 @@ function Dispatcher:emit(event, ...)
   end
 end
 
-function Dispatcher:clear_listeners()
-  self._.listeners = {}
+function Dispatcher:clear_listeners(listeners)
+  if listeners then
+    for _, event in pairs(listeners) do
+      self._.listeners[event] = {}
+    end
+  else
+    self._.listeners = {}
+  end
 end
 
 return Dispatcher
