@@ -9,6 +9,7 @@ local events = {
   Repaint = "Repaint",
 
   BufEnter = "BufEnter",
+  BufLeave = "BufLeave",
   FileType = "FileType", -- To catch the resulting buffer when one is removed
   BufWinEnter = "BufWinEnter",
 

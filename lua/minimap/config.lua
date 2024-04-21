@@ -21,6 +21,7 @@ local defaults = {
     require("minimap.builtin.behaviors.rebuild_map_when_buffer_changed"),
     require("minimap.builtin.behaviors.restore_previous_buffer"),
     require("minimap.builtin.behaviors.move_map_viewport"),
+    require("minimap.builtin.behaviors.move_buffer_viewport"),
   },
   ignored = {
     buf_types = { "nofile", "nowrite", "quickfix", "terminal", "help", "prompt", "NvimTree" },

@@ -81,6 +81,13 @@ function Buffer:get_cursor_line()
   return vim.api.nvim_win_get_cursor(window)[1]
 end
 
+function Buffer:set_cursor_line(line)
+  local window = self:get_window()
+  if not window then return end
+
+  vim.api.nvim_win_set_cursor(window, { line, 0 })
+end
+
 function Buffer:get_window()
   local windows_for_buffer = {}
   local all_windows = vim.api.nvim_list_wins()

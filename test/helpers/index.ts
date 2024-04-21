@@ -59,12 +59,13 @@ export default (nvim: NeovimClient) => {
   )
 
   return {
-    call,
     bufferCount,
+    call,
     get,
-    withinMinimap,
     getMinimapMatches,
     getMinimapText,
-    // gotoWindow,
+    getMinimapWindow,
+    gotoWindow,
+    withinMinimap,
   }
 }

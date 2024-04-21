@@ -36,13 +36,19 @@ end
 local function transpose_line(line, source, destination)
   local source_line_count = vim.api.nvim_buf_line_count(source)
   local source_scroll_ratio = line / source_line_count
-
   local destination_line_count = vim.api.nvim_buf_line_count(destination)
-  local transposed = source_scroll_ratio * destination_line_count
 
-  if line > source_line_count then
-    return destination_line_count
+  -- Ensure boundaries align
+  if line == 1 then return 1 end                                      -- First = first
+  if line == source_line_count then return destination_line_count end -- Last = last
+  if line > source_line_count then return destination_line_count end  -- Clamp boundary
+
+  local transposed = source_scroll_ratio * destination_line_count
+  if destination_line_count > source_line_count then
+    -- When mapping to a larger buffer
+    return math.floor(transposed) - 1
   else
+    -- When mapping to a smaller buffer
     return math.ceil(transposed)
   end
 end

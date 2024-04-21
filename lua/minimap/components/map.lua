@@ -190,33 +190,31 @@ function Map:register_listeners()
     group = self._.autogroup.self,
   })
 
-  -- vim.api.nvim_create_autocmd(events.BufDelete, {
-  --   callback = function() self:_handle_buffer_deleted() end,
-  --   buffer = self.buffer.bufnr,
-  --   group = self._.autogroup.self,
-  -- })
+  vim.api.nvim_create_autocmd(events.BufEnter, {
+    callback = function() self:_handle_focus() end,
+    buffer = self.buffer.bufnr,
+    group = self._.autogroup.self,
+  })
 
-  -- vim.api.nvim_create_autocmd({events.WinScrolled, events.CursorMoved}, {
-  --   callback = function() self:_handle_map_scroll() end,
-  --   buffer = self.buffer.bufnr,
-  --   group = self._.autogroup.self,
-  -- })
+  vim.api.nvim_create_autocmd(events.BufLeave, {
+    callback = function() self:_handle_blur() end,
+    buffer = self.buffer.bufnr,
+    group = self._.autogroup.self,
+  })
 end
 
--- function Map:_handle_map_scroll()
---   local current_line = self.buffer:get_cursor_line()
---   self:emit(events.RowChanged, current_line)
---   self:repaint("map scrolling")
--- end
+function Map:_handle_focus()
+  self.buffer:register_listeners("MinimapBuffer", { events.RowChanged })
+  self.buffer:on(events.RowChanged, function(...) self:emit(events.RowChanged, ...) end) -- relay event from buffer
+end
+
+function Map:_handle_blur()
+  self.buffer:clear_listeners({ events.RowChanged })
+end
 
 function Map:_handle_resize()
   self:size()
   self:repaint("resized")
-end
-
-function Map:_handle_buffer_deleted()
-  -- print("MY BUFFER WAS DELETED! " .. self.buffer.name)
-  -- self:hide()
 end
 
 return Map
