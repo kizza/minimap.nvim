@@ -11,9 +11,8 @@ local function build_palette(buffer)
     return
   end
 
-  -- local buffer_window = buffer:get_window()
-  -- local current_line = vim.api.nvim_win_get_cursor(buffer_window)[1]
-  local current_line = vim.api.nvim_win_get_cursor(0)[1]
+  local buffer_window = buffer:get_window()
+  local current_line = vim.api.nvim_win_get_cursor(buffer_window)[1]
 
   return {
     {
