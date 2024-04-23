@@ -3,7 +3,7 @@ local events = require("minimap.events")
 local M = {}
 
 vim.cmd [[
-  hi MinimapSearch ctermfg=white ctermbg=magenta
+  hi MinimapSearch ctermfg=0 ctermbg=magenta
 ]]
 
 local find = string.find

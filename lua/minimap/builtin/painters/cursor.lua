@@ -3,7 +3,7 @@ local events = require("minimap.events")
 local M = {}
 
 vim.cmd [[
-  hi MinimapCursorLine ctermfg=cyan ctermbg=19
+  hi MinimapCursorLine ctermfg=cyan ctermbg=20
 ]]
 
 local function build_palette(buffer)

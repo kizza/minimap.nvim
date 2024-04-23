@@ -6,13 +6,13 @@ vim.cmd [[
   hi MinimapChanged ctermfg=magenta
   hi MinimapRemoved ctermfg=red
 
-  hi MinimapAddedViewport ctermfg=green ctermbg=18
-  hi MinimapChangedViewport ctermfg=magenta ctermbg=18
-  hi MinimapRemovedViewport ctermfg=red ctermbg=18
+  hi MinimapAddedViewport ctermfg=green ctermbg=19
+  hi MinimapChangedViewport ctermfg=magenta ctermbg=19
+  hi MinimapRemovedViewport ctermfg=red ctermbg=19
 
-  hi MinimapAddedCursorLine ctermfg=green ctermbg=19
-  hi MinimapChangedCursorLine ctermfg=magenta ctermbg=19
-  hi MinimapRemovedCursorLine ctermfg=red ctermbg=19
+  hi MinimapAddedCursorLine ctermfg=green ctermbg=20
+  hi MinimapChangedCursorLine ctermfg=magenta ctermbg=20
+  hi MinimapRemovedCursorLine ctermfg=red ctermbg=20
 ]]
 
 local function build_git_palette(hunks)
