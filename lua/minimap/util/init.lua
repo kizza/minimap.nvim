@@ -37,6 +37,18 @@ function M.merge_tables(first_table, second_table)
   return first_table
 end
 
+function M.merge_hl_groups(new_hl_group, opts)
+  local merged = {}
+
+  local fg = vim.api.nvim_get_hl_by_name(opts.fg, true).foreground
+  if fg then merged.fg = string.format("#%06x", fg) end
+
+  local bg = vim.api.nvim_get_hl_by_name(opts.bg, true).background
+  if bg then merged.bg = string.format("#%06x", bg) end
+
+  vim.api.nvim_set_hl(0, new_hl_group, merged)
+end
+
 function M.round(number)
   return math.floor(number + 0.5)
 end

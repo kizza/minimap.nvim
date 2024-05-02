@@ -1,10 +1,14 @@
 local events = require("minimap.events")
+local util = require("minimap.util")
 
 local M = {}
 
-vim.cmd [[
-  hi MinimapSearch ctermfg=0 ctermbg=magenta
-]]
+-- Default highlights
+vim.api.nvim_set_hl(0, "MinimapSearch", { link = "Search" })
+
+-- Variants within minimap
+util.merge_hl_groups("MinimapSearchCursorLine", {fg = "MinimapSearch", bg = "MinimapCursorLine"})
+util.merge_hl_groups("MinimapSearchViewport", {fg = "MinimapSearch", bg = "MinimapViewport"})
 
 local find = string.find
 

@@ -1,19 +1,21 @@
 local gitsigns = require("gitsigns")
+local util = require("minimap.util")
 local M = {}
 
-vim.cmd [[
-  hi MinimapAdded ctermfg=green
-  hi MinimapChanged ctermfg=magenta
-  hi MinimapRemoved ctermfg=red
+-- Default highlights
+vim.api.nvim_set_hl(0, "MinimapAdded", { link = "DiffAdd" })
+vim.api.nvim_set_hl(0, "MinimapChanged", { link = "DiffChange" })
+vim.api.nvim_set_hl(0, "MinimapRemoved", { link = "DiffDelete" })
 
-  hi MinimapAddedViewport ctermfg=green ctermbg=19
-  hi MinimapChangedViewport ctermfg=magenta ctermbg=19
-  hi MinimapRemovedViewport ctermfg=red ctermbg=19
+-- When in cursor line
+util.merge_hl_groups("MinimapAddedCursorLine", { fg = "MinimapAdded", bg = "MinimapCursorLine" })
+util.merge_hl_groups("MinimapChangedCursorLine", { fg = "MinimapChanged", bg = "MinimapCursorLine" })
+util.merge_hl_groups("MinimapRemovedCursorLine", { fg = "MinimapRemoved", bg = "MinimapCursorLine" })
 
-  hi MinimapAddedCursorLine ctermfg=green ctermbg=20
-  hi MinimapChangedCursorLine ctermfg=magenta ctermbg=20
-  hi MinimapRemovedCursorLine ctermfg=red ctermbg=20
-]]
+-- When within viewport
+util.merge_hl_groups("MinimapAddedViewport", { fg = "MinimapAdded", bg = "MinimapViewport" })
+util.merge_hl_groups("MinimapChangedViewport", { fg = "MinimapChanged", bg = "MinimapViewport" })
+util.merge_hl_groups("MinimapRemovedViewport", { fg = "MinimapRemoved", bg = "MinimapViewport" })
 
 local function build_git_palette(hunks)
   local palette = {}
