@@ -37,13 +37,25 @@ local function build_git_palette(hunks)
         }
       })
     elseif (hunk.type == "change") then
-      local start = math.min(hunk.added.start, hunk.removed.start)
-      local count = hunk.added.count - 1
+      table.insert(palette, {
+        highlight = "MinimapAdded",
+        ranges = {
+          { hunk.added.start, hunk.added.start + hunk.added.count - 1 }
+        }
+      })
 
       table.insert(palette, {
         highlight = "MinimapChanged",
         ranges = {
-          { start, start + count }
+          {
+            -- Removal cannot be earlier than add
+            math.max(hunk.added.start, hunk.removed.start),
+            -- Removal cannot extend beyond add
+            math.min(
+              hunk.added.start + hunk.added.count - 1,
+              hunk.removed.start + hunk.removed.count - 1
+            ),
+          }
         }
       })
     end
