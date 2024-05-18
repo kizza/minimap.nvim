@@ -46,8 +46,7 @@ function Agent:register_mapped_buffer(buffer)
     buffer:debug("Already registered")
     if not self._.map:valid() then
       -- print("Yes, there is a problem, the window isn't open")
-      self._.map:hide()
-      self._.map:show()
+      self._.map:reopen()
     end
     return false
   end

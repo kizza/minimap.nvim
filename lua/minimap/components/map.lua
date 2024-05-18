@@ -138,7 +138,11 @@ end
 
 function Map:show()
   if self._.split._.mounted == true then
-    self:build()
+    if not self:_within_current_tab() then
+      self:reopen()
+    else
+      self:build()
+    end
     return
   end
 
@@ -147,6 +151,12 @@ function Map:show()
   self:_build_buffer()
   self:register_listeners()
   self:build()
+end
+
+-- If not within current tab, or otherwise closed
+function Map:reopen()
+  self:hide()
+  self:show()
 end
 
 function Map:hide()
@@ -215,6 +225,17 @@ end
 function Map:_handle_resize()
   self:size()
   self:repaint("resized")
+end
+
+function Map:_within_current_tab()
+  local current_tab = vim.api.nvim_get_current_tabpage()
+  local tab_windows = vim.api.nvim_tabpage_list_wins(current_tab)
+
+  for _, win in ipairs(tab_windows) do
+    if win == self.winid then
+      return true
+    end
+  end
 end
 
 return Map

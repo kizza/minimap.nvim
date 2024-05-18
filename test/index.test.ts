@@ -55,7 +55,6 @@ describe("buffer management", () => {
         // Minimap text is set
         const lines = await getMinimapText()
         assert.equal(lines, '⠟⠁        ')
-        // assert.equal(lines, '⠿⠿⠿⠛⠛⠛⠋⠉⠉⠉')
       }));
 
     it("closes the minimap when closing the buffer", () =>
@@ -95,7 +94,7 @@ describe("buffer management", () => {
   });
 
   describe("multiple buffers", () => {
-    it("returns to the previous buffer", () =>
+    it("when closing buffer, returns to the previous buffer", () =>
       withVim(async nvim => {
         const { bufferCount, getMinimapText } = buildHelpers(nvim)
 
@@ -115,6 +114,35 @@ describe("buffer management", () => {
       }));
   });
 });
+
+describe("tab management", () => {
+  it("opens the minimap when opening a new tab", () =>
+    withVim(async nvim => {
+      const { bufferCount, get, getMinimapText, getMinimapWindowId } = buildHelpers(nvim)
+
+      // Minimap window opens when buffer does
+      assert.equal(await get('winnr("$")'), "1")
+      await nvim.command('edit fixtures/buffer.txt');
+      assert.equal(await getMinimapText(), '⠟⠁        ')
+
+      // Open another buffer in a tab
+      await nvim.command('tabedit fixtures/buffer_two.txt');
+      assert.equal(await get('tabpagenr("$")'), "2")
+      assert.equal(await getMinimapText(), '⠿⠇        ')
+      assert.equal(await bufferCount(), 2)
+
+      // Assert on tab details
+      const raw = await get<any>('gettabinfo()')
+      const tabinfo = JSON.parse(raw.replace(/'/g, '"'));
+      assert.equal(tabinfo.length, 2) // Two tabs
+      assert.equal(tabinfo[0].windows.length, 1) // First with only one window
+      assert.equal(tabinfo[1].windows.length, 2) // Second with two (ie. minimap)
+
+      // Assert current tab's second window is new minimap
+      const minimapWindowId = await getMinimapWindowId()
+      assert.equal(tabinfo[1].windows[1], minimapWindowId)
+    }));
+})
 
 describe("live updates", () => {
   it("updates the minimap when changed", () =>

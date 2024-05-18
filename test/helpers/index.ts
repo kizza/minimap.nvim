@@ -40,6 +40,7 @@ export default (nvim: NeovimClient) => {
   const gotoWindow = (windowNumber: number) => call(`win_gotoid(win_getid(${windowNumber}))`)
 
   const getMinimapWindow = () => get<number>('bufwinnr("~minimap~")')
+  const getMinimapWindowId = () => get<number>('win_getid(bufwinnr("~minimap~"))')
 
   const withWindow = async <T>(windowNumber: number, fun: () => T) => {
     const currentWindow = await get<number>('winnr()')
@@ -65,6 +66,7 @@ export default (nvim: NeovimClient) => {
     getMinimapMatches,
     getMinimapText,
     getMinimapWindow,
+    getMinimapWindowId,
     gotoWindow,
     withinMinimap,
   }
