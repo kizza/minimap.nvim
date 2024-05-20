@@ -4,12 +4,10 @@ import buildHelpers from "./helpers";
 import withPlugin from "./helpers/vim";
 
 const withVim = (fn: WithVim) => withPlugin({
-  map: {
-    width: 12,
-    debounce: {
-      build: 0,
-      paint: 0,
-    }
+  width: 12,
+  debounce: {
+    build: 0,
+    paint: 0,
   }
 }, fn)
 

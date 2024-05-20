@@ -34,22 +34,22 @@ function Map:init(config)
     listeners = {},
     lines = {},
     builder = nil,
-    painter = Painter(self, config.options.map.painters),
+    painter = Painter(self, config.options.painters),
     namespace = vim.api.nvim_create_namespace("MinimapMap"),
     autogroup = {
       self = vim.api.nvim_create_augroup("MinimapMapEvents", { clear = true })
     },
     debouncers = {
-      build = Debounce({ delay = config.options.map.debounce.build }),
-      paint = Debounce({ delay = config.options.map.debounce.paint }),
+      build = Debounce({ delay = config.options.debounce.build }),
+      paint = Debounce({ delay = config.options.debounce.paint }),
     },
   }
   self.buffer = nil
   self.winid = -1
-  self.width = config.options.map.width
+  self.width = config.options.width
 
   self:_build_split()
-  self:_build_builder(config.options.map.builder)
+  self:_build_builder(config.options.builder)
 end
 
 function Map:build()

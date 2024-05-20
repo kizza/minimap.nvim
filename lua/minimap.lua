@@ -44,7 +44,7 @@ function M.run(options)
     end
 
     if agent:register_mapped_buffer(buffer) then
-      for _, painter in ipairs(config.options.map.painters) do
+      for _, painter in ipairs(config.options.painters) do
         painter.register(buffer, map)
       end
 

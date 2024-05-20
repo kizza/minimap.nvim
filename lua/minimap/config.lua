@@ -3,25 +3,23 @@ local Config = Object("MinimapConfig")
 local util = require("minimap.util")
 
 local defaults = {
-  map = {
-    width = 12,
-    builder = require("minimap.builtin.builders.code_minimap"),
-    painters = {
-      require("minimap.builtin.painters.viewport"),
-      require("minimap.builtin.painters.cursor"),
-      require("minimap.builtin.painters.gitsigns"),
-      require("minimap.builtin.painters.search"),
-    },
-    debounce = {
-      build = 1000,
-      paint = 50,
-    }
+  width = 12,
+  builder = require("minimap.builtin.builders.code_minimap"),
+  painters = {
+    require("minimap.builtin.painters.viewport"),
+    require("minimap.builtin.painters.cursor"),
+    require("minimap.builtin.painters.gitsigns"),
+    require("minimap.builtin.painters.search"),
   },
   behaviors = {
     require("minimap.builtin.behaviors.rebuild_map_when_buffer_changed"),
     require("minimap.builtin.behaviors.restore_previous_buffer"),
     require("minimap.builtin.behaviors.move_map_viewport"),
     require("minimap.builtin.behaviors.move_buffer_viewport"),
+  },
+  debounce = {
+    build = 1000,
+    paint = 50,
   },
   ignored = {
     buf_types = { "nofile", "nowrite", "quickfix", "terminal", "help", "prompt", "NvimTree" },
