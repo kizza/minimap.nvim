@@ -60,6 +60,12 @@ function Buffer:register_listeners(augroup_name, listeners)
       group = augroup,
     })
   end
+
+  -- Always clean up
+  -- vim.api.nvim_create_autocmd(events.BufUnload, {
+  --   callback = function() self:clear_listeners() end,
+  --   buffer = self.bufnr,
+  -- })
 end
 
 function Buffer:_row_changed_handler()

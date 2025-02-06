@@ -3,10 +3,9 @@ local events = require("minimap.events")
 
 local M = {}
 
-function M.register(buffer, agent, map)
+function M.register(buffer, _agent, map)
   buffer:on(events.RowChanged, function(row)
     if not map:valid() then
-      -- print("RowChanged from buffer " .. buffer.name .. ", but map is not valid")
       return
     end
 

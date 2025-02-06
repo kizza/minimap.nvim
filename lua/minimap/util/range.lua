@@ -78,6 +78,7 @@ local function transpose_column(column, source, source_line, destination, destin
   local source_line_length = get_line_length(source, source_line)
   local source_ratio = column / source_line_length
 
+  -- vim.fn.strdisplaywidth
   local destination_line_length = get_line_length(destination, destination_line) --/ 3 -- remember font chars
   local transposed = source_ratio * destination_line_length
   local rounded = util.round(transposed)

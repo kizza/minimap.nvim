@@ -1,7 +1,7 @@
 local Object = require("nui.object")
 
---- @class Dispatcher
---- @param extend function
+-- --- @class Dispatcher: Object
+-- --- @field emit fun(event: any, any): nil
 local Dispatcher = Object("MinimapDispatcher")
 
 function Dispatcher:init()
@@ -10,6 +10,8 @@ function Dispatcher:init()
   }
 end
 
+---@param event Event
+---@param callback function
 function Dispatcher:on(event, callback)
   if not self._.listeners[event] then
     self._.listeners[event] = {}

@@ -3,7 +3,7 @@ local events = require("minimap.events")
 
 local M = {}
 
-function M.register(buffer, agent, map)
+function M.register(buffer, _agent, map)
   map:on(events.RowChanged, function(row)
     if not map:valid() then
       return
@@ -12,6 +12,7 @@ function M.register(buffer, agent, map)
     buffer:set_cursor_line(
       range_helper.transpose_position(row, map.buffer.bufnr, buffer.bufnr).line
     )
+
     map:repaint("map line moved")
   end)
 end

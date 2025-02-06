@@ -27,14 +27,7 @@ function M.trim_trailing_whitespace(text)
 end
 
 function M.merge_tables(first_table, second_table)
-  for k, v in pairs(second_table) do
-    if type(v) == "table" then
-      first_table[k] = M.merge_tables(first_table[k], v)
-    else
-      first_table[k] = v
-    end
-  end
-  return first_table
+  return vim.tbl_deep_extend("force", first_table, second_table)
 end
 
 function M.merge_hl_groups(new_hl_group, opts)

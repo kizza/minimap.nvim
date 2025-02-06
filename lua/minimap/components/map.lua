@@ -20,16 +20,17 @@ local Split = require("nui.split")
 ---@field split? Split
 ---@field builder? Builder
 ---@field painter Painter
----@field debouncers: { build: Debounce, paint: Debounce }
+---@field debouncers { build: Debounce, paint: Debounce }
 
----@class Map: Dispatcher
----@field bufnr number
----@field winid number
----@field width number
----@field private _ internal
+---class Map: Dispatcher
+---field bufnr number
+---field winid number
+---field width number
+---field private _ internal
 local Map = Dispatcher:extend("MinimapWindow")
 
 function Map:init(config)
+  ---@as internal
   self._ = {
     listeners = {},
     lines = {},
@@ -75,7 +76,7 @@ function Map:paint(...)
   self._.painter:paint(...)
 end
 
-function Map:repaint(reason)
+function Map:repaint(_reason)
   -- print("Repainting: " .. reason)
   self._.debouncers.paint:run(function()
     if self:valid() then
@@ -108,6 +109,7 @@ function Map:_build_split()
       winhighlight = "Normal:MinimapNormal", -- ,CursorLine:MinimapCursorLine",
       scrolloff = 0,
       sidescrolloff = 0,
+      statuscolumn = "", -- **Disable status column for this window**
     }
   })
 end
@@ -136,6 +138,12 @@ function Map:valid()
   return vim.api.nvim_win_is_valid(self.winid) -- and vim.api.nvim_buf_is_valid(self.buffer.bufnr)
 end
 
+-- function Map:showing()
+--   if self._.split._.mounted == false then return false end
+--   if not self:_within_current_tab() then return false end
+--   return true
+-- end
+
 function Map:show()
   if self._.split._.mounted == true then
     if not self:_within_current_tab() then
@@ -145,6 +153,8 @@ function Map:show()
     end
     return
   end
+
+  -- print("Show, unmounted")
 
   self._.split:mount()
   self.winid = self._.split.winid
@@ -164,6 +174,7 @@ function Map:hide()
 end
 
 function Map:close()
+  pcall(vim.api.nvim_win_close, self.winid, false)
   self._.split:unmount()
   self:clear_listeners()
 end

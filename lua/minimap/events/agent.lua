@@ -7,6 +7,7 @@ local Agent = Dispatcher:extend("MinimapAgent")
 function Agent:init(map, config)
   self._ = {
     listeners = {},
+    config = config,
     map = map,
     registered_buffer = nil,
     autogroup = {
@@ -14,6 +15,18 @@ function Agent:init(map, config)
     }
   }
   -- self:_build_highlights()
+end
+
+function Agent:try_show_map()
+  if self._.registered_buffer then return end
+
+  local try_buffer
+  for bufnr = 1, vim.fn.bufnr('$') do
+    try_buffer = Buffer({ bufnr = bufnr })
+    if not self._.config:ignored(try_buffer) then
+      self:emit(events.BufferActive, try_buffer)
+    end
+  end
 end
 
 function Agent:register_listeners()
@@ -41,14 +54,20 @@ function Agent:register_listeners()
 end
 
 function Agent:register_mapped_buffer(buffer)
-  local already_registered = self._.registered_buffer and self._.registered_buffer.bufnr == buffer.bufnr
-  if already_registered then
-    buffer:debug("Already registered")
-    if not self._.map:valid() then
-      -- print("Yes, there is a problem, the window isn't open")
-      self._.map:reopen()
+  -- Current registered buffer?
+  if self._.registered_buffer then
+    local already_registered = self._.registered_buffer.bufnr == buffer.bufnr
+    if already_registered then
+      buffer:debug("Already registered")
+      if not self._.map:valid() then
+        -- print("Yes, there is a problem, the window isn't open")
+        self._.map:reopen()
+      end
+      return false
+    else
+      -- buffer:debug("Clear listeners")
+      -- self._.registered_buffer:clear_listeners()
     end
-    return false
   end
 
   buffer:debug("Registering buffer")

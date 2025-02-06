@@ -3,15 +3,10 @@ import * as path from "path";
 import fs from "fs";
 import { WithVim, delay, setBuffer } from "nvim-test-js";
 import buildHelpers from "./helpers";
-import withPlugin from "./helpers/vim";
+import withPlugin, { defaultPluginOptions, withoutPlugin } from "./helpers/vim";
+import { stringify } from "./helpers/lua";
 
-const withVim = (fn: WithVim) => withPlugin({
-  width: 10,
-  debounce: {
-    build: 0,
-    paint: 0,
-  }
-}, fn)
+const withVim = (fn: WithVim) => withPlugin(defaultPluginOptions, fn)
 
 describe("sanity check", () => {
   it("gives me the vim", () =>
@@ -100,7 +95,7 @@ describe("buffer management", () => {
         assert.equal(await getMinimapText(), '⠟⠁        ')
         assert.equal(await bufferCount(), 1)
 
-        await delay(700) // Buffer history order is by time, so need a slight delay
+        await delay(800) // Buffer history order is by time, so need a slight delay
 
         await nvim.command('edit fixtures/buffer_two.txt');
         assert.equal(await getMinimapText(), '⠿⠇        ')
@@ -110,6 +105,17 @@ describe("buffer management", () => {
         assert.equal(await getMinimapText(), '⠟⠁        ')
         assert.equal(await bufferCount(), 1)
       }));
+
+    describe("with lazily loaded", () =>
+      it("opens the minimap for an already opened buffer", () =>
+        withoutPlugin(async nvim => {
+          const { getMinimapText } = buildHelpers(nvim)
+
+          await nvim.command('edit fixtures/buffer.txt');
+          await nvim.executeLua(`require("minimap").setup(${stringify(defaultPluginOptions)})`)
+
+          assert.equal(await getMinimapText(), '⠟⠁        ')
+        })))
   });
 });
 

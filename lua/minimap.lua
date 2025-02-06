@@ -10,11 +10,11 @@ local M = {}
 function M.setup(options)
   if not vim.g.loaded_minimap then
     vim.g.loaded_minimap = true
-    M.run(options or {})
+    M.initialize(options or {})
   end
 end
 
-function M.run(options)
+function M.initialize(options)
   local config = Config(options)
   local map = Map(config)
   local agent = Agent(map, config)
@@ -24,6 +24,14 @@ function M.run(options)
   vim.api.nvim_create_user_command("MinimapClearSearch", function()
     vim.g.minimap_search_term = nil
     map:repaint()
+  end, {})
+
+  vim.api.nvim_create_user_command("MinimapOpen", function()
+    map:show()
+  end, {})
+
+  vim.api.nvim_create_user_command("MinimapClose", function()
+    map:hide()
   end, {})
 
   -- To debug
@@ -59,6 +67,8 @@ function M.run(options)
   agent:on(events.MinimapActive, function(buffer)
     -- No action yet
   end)
+
+  agent:try_show_map()
 end
 
 function M.create_default_highlights()
