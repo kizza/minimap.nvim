@@ -20,6 +20,7 @@ local defaults = {
   debounce = {
     build = 1000,
     paint = 50,
+    resize = 50,
   },
   ignored = {
     buf_types = { "nofile", "nowrite", "quickfix", "terminal", "help", "prompt", "NvimTree" },

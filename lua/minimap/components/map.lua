@@ -43,6 +43,7 @@ function Map:init(config)
     debouncers = {
       build = Debounce({ delay = config.options.debounce.build }),
       paint = Debounce({ delay = config.options.debounce.paint }),
+      resize = Debounce({ delay = config.options.debounce.resize }),
     },
   }
   self.buffer = nil
@@ -204,9 +205,18 @@ function Map:register_listeners()
 
   vim.api.nvim_create_autocmd(events.WinClosed, {
     callback = function(args)
-      if args.match ~= tostring(self.winid) then return end
-      self._.split:unmount()
-      self:emit(events.MinimapClosed)
+      if args.match ~= tostring(self.winid) then
+        -- Handle resize (if affected)
+        local closed_win_config = vim.api.nvim_win_get_config(tonumber(args.match))
+        local closed_buftype = vim.api.nvim_buf_get_option(args.buf, "buftype")
+        -- if closed_win_config.relative ~= "editor" and closed_win_config.relative ~= "" then
+        if closed_win_config.relative == "" then
+          self:_handle_resize()
+        end
+      else
+        self._.split:unmount()
+        self:emit(events.MinimapClosed)
+      end
     end,
     group = self._.autogroup.self,
   })
@@ -234,8 +244,10 @@ function Map:_handle_blur()
 end
 
 function Map:_handle_resize()
-  self:size()
-  self:repaint("resized")
+  self._.debouncers.resize:run(function()
+    self:size()
+    self:repaint("resized")
+  end)
 end
 
 function Map:_within_current_tab()
