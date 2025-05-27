@@ -70,7 +70,9 @@ end
 
 -- Fixes size if/when misaligned
 function Map:size()
-  vim.cmd("vertical " .. self.winid .. "resize " .. self.width)
+  if self._.split._.mounted == true then
+    vim.api.nvim_win_set_width(self.winid, self.width)
+  end
 end
 
 function Map:paint(...)
