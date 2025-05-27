@@ -33,13 +33,17 @@ end
 function M.merge_hl_groups(new_hl_group, opts)
   local merged = {}
 
-  local fg = vim.api.nvim_get_hl_by_name(opts.fg, true).foreground
+  local fg = M.extract_highlights(opts.fg).fg
   if fg then merged.fg = string.format("#%06x", fg) end
 
-  local bg = vim.api.nvim_get_hl_by_name(opts.bg, true).background
-  if bg then merged.bg = string.format("#%06x", bg) end
+  local bg = M.extract_highlights(opts.bg).bg
+  if bg then merged.background = string.format("#%06x", bg) end
 
   vim.api.nvim_set_hl(0, new_hl_group, merged)
+end
+
+function M.extract_highlights(hl_group)
+  return vim.api.nvim_get_hl(0, { name = hl_group })
 end
 
 function M.round(number)

@@ -3,9 +3,9 @@ local util = require("minimap.util")
 local M = {}
 
 -- Default highlights
-vim.api.nvim_set_hl(0, "MinimapAdded", { link = "DiffAdd" })
-vim.api.nvim_set_hl(0, "MinimapChanged", { link = "DiffChange" })
-vim.api.nvim_set_hl(0, "MinimapRemoved", { link = "DiffDelete" })
+vim.api.nvim_set_hl(0, "MinimapAdded", { fg = util.extract_highlights("DiffAdd").fg })
+vim.api.nvim_set_hl(0, "MinimapChanged", { fg = util.extract_highlights("DiffChange").fg })
+vim.api.nvim_set_hl(0, "MinimapRemoved", { fg = util.extract_highlights("DiffDelete").fg })
 
 -- When in cursor line
 util.merge_hl_groups("MinimapAddedCursorLine", { fg = "MinimapAdded", bg = "MinimapCursorLine" })
