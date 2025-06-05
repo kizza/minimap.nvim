@@ -7,8 +7,8 @@ local M = {}
 vim.api.nvim_set_hl(0, "MinimapSearch", { link = "Search" })
 
 -- Variants within minimap
-util.merge_hl_groups("MinimapSearchCursorLine", {fg = "MinimapSearch", bg = "MinimapCursorLine"})
-util.merge_hl_groups("MinimapSearchViewport", {fg = "MinimapSearch", bg = "MinimapViewport"})
+util.merge_hl_groups("MinimapSearchCursorLine", { fg = "MinimapSearch", bg = "MinimapCursorLine" })
+util.merge_hl_groups("MinimapSearchViewport", { fg = "MinimapSearch", bg = "MinimapViewport" })
 
 local find = string.find
 

@@ -105,11 +105,11 @@ function Map:_build_split()
     win_options = {
       number = false,
       relativenumber = false,
-      fillchars = "eob: ,vert:|,fold:-,diff:-",
+      fillchars = "eob: ", -- ,vert:│,fold:-,diff:-",
       listchars = "trail: ",
       wrap = false,
       signcolumn = "no",
-      winhighlight = "Normal:MinimapNormal", -- ,CursorLine:MinimapCursorLine",
+      winhighlight = "Normal:MinimapNormal,CursorLine:MinimapCursorLine",
       scrolloff = 0,
       sidescrolloff = 0,
       statuscolumn = "", -- **Disable status column for this window**

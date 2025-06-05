@@ -3,7 +3,7 @@ local util = require("minimap.util")
 
 local M = {}
 
-util.merge_hl_groups("MinimapCursorLine", {fg = "Type", bg = "PmenuSel"})
+util.merge_hl_groups("MinimapCursorLine", {fg = "Type", bg = "DiagnosticWarn"})
 
 local function build_palette(buffer_window)
   local current_line = vim.api.nvim_win_get_cursor(buffer_window)[1]

@@ -50,28 +50,6 @@ function Painter:_paint(buffer)
   end
 end
 
-function Painter:_build_variants(highlights)
-  local cursor = vim.api.nvim_get_hl_by_name("MinimapCursorLine", false)
-  local viewport = vim.api.nvim_get_hl_by_name("MinimapViewport", false)
-
-  for _, highlight in pairs(highlights) do
-    if highlight.name ~= "MinimapCursorLine" and highlight.name ~= "MinimapViewport" then
-      if not self._.variants[highlight.name] then
-        local styles = vim.api.nvim_get_hl_by_name(highlight.name, false)
-        self:_build_variant(highlight.name .. "CursorLine", styles, cursor)
-        self:_build_variant(highlight.name .. "Viewport", styles, viewport)
-      end
-    end
-  end
-end
-
-function Painter:_build_variant(name, original, additional)
-  local variant = original
-  variant["ctermfg"] = original.foreground   -- to maintain cterm use
-  variant["ctermbg"] = additional.background -- overlay background
-  variant["background"] = original.background
-  self._.variants[name] = vim.api.nvim_set_hl(0, name, variant)
-end
 
 function Painter:_build_highlights(buffer)
   local highlights = {}

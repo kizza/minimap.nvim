@@ -2,7 +2,6 @@ local events = require("minimap.events")
 
 local M = {}
 
-vim.api.nvim_set_hl(0, "MinimapViewport", { link = "Pmenu" })
 
 local function build_palette(buffer_window_id)
   return {
