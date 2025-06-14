@@ -109,7 +109,7 @@ function Map:_build_split()
       listchars = "trail: ",
       wrap = false,
       signcolumn = "no",
-      winhighlight = "Normal:MinimapNormal,CursorLine:MinimapCursorLine",
+      winhighlight = "Normal:MinimapNormal,CursorLine:MinimapCursorLine,StatusLine:MinimapNone,StatusLineNC:MinimapNone",
       scrolloff = 0,
       sidescrolloff = 0,
       statuscolumn = "", -- **Disable status column for this window**
