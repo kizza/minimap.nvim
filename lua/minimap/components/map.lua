@@ -2,6 +2,7 @@ local Buffer = require("minimap.components.buffer")
 local Builder = require("minimap.components.builder")
 local Painter = require("minimap.components.painter")
 local Dispatcher = require("minimap.events.dispatcher")
+local util = require("minimap.util")
 local Debounce = require("minimap.util.debounce")
 local const = require("minimap.const")
 local events = require("minimap.events")
@@ -208,16 +209,46 @@ function Map:register_listeners()
   vim.api.nvim_create_autocmd(events.WinClosed, {
     callback = function(args)
       if args.match ~= tostring(self.winid) then
-        -- Handle resize (if affected)
-        local closed_win_config = vim.api.nvim_win_get_config(tonumber(args.match))
-        local closed_buftype = vim.api.nvim_buf_get_option(args.buf, "buftype")
-        -- if closed_win_config.relative ~= "editor" and closed_win_config.relative ~= "" then
-        if closed_win_config.relative == "" then
-          self:_handle_resize()
+        -- local opts = vim.api.nvim_win_get_config(tonumber(args.match))
+        -- local bufvars = vim.fn.getbufinfo(args.buf)
+        -- print(vim.inspect(bufvars))
+        -- print("WinClosed " .. vim.inspect(args) .. " win=" .. vim.inspect(opts) .. " buf=" .. vim.inspect(bufvars) )
+        -- -- print("Windwo left is " .. vim.fn.winnr('$'))
+        local visible_split_windows = util.get_visible_window_splits()
+        -- print(vim.inspect(visible_split_windows))
+        -- if vim.fn.winnr('$') == 1 then
+        if #visible_split_windows == 1 then
+          vim.notify("Minimap is the only window remaining", vim.log.levels.WARN)
         end
+
+        -- Handle resize (if affected)
+        local closed_win_id = tonumber(args.match)
+        self:_handle_other_win_resize(closed_win_id)
       else
         self._.split:unmount()
         self:emit(events.MinimapClosed)
+      end
+    end,
+    group = self._.autogroup.self,
+  })
+
+  -- Resize when anotehr window comes
+  vim.api.nvim_create_autocmd(events.WinNew, {
+    callback = function(args)
+      if args.match ~= tostring(self.winid) then
+        local new_win_id = vim.api.nvim_get_current_win() -- file path is passed as args.march
+        self:_handle_other_win_resize(new_win_id)
+      end
+    end,
+    group = self._.autogroup.self,
+  })
+
+  vim.api.nvim_create_autocmd(events.BufWinEnter, {
+    callback = function(args)
+      if vim.api.nvim_get_current_win() == tostring(self.winid) then
+        if args.buf ~= self.bufnr then
+          vim.notify("A non-minimap buffer has entered minimap", vim.log.levels.WARN)
+        end
       end
     end,
     group = self._.autogroup.self,
@@ -250,6 +281,14 @@ function Map:_handle_resize()
     self:size()
     self:repaint("resized")
   end)
+end
+
+function Map:_handle_other_win_resize(win_id)
+  local other_win_config = vim.api.nvim_win_get_config(win_id)
+  -- if closed_win_config.relative == "" then
+  if other_win_config.split == "left" or other_win_config.split == "right" then
+    self:_handle_resize()
+  end
 end
 
 function Map:_within_current_tab()

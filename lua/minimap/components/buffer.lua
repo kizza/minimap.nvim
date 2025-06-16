@@ -45,6 +45,14 @@ function Buffer:register_listeners(augroup_name, listeners)
     })
   end
 
+  if util.contains(listeners, events.WinClosed) then
+    vim.api.nvim_create_autocmd(events.WinClosed, {
+      callback = function(args) self:emit(events.WinClosed, args, self) end,
+      buffer = self.bufnr,
+      group = augroup,
+    })
+  end
+
   if util.contains(listeners, events.BufferChanged) then
     vim.api.nvim_create_autocmd({ events.TextChanged, events.TextChangedI, events.InsertLeave }, {
       callback = function() self:emit(events.BufferChanged, self) end,

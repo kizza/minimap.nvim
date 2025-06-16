@@ -2,20 +2,22 @@ local gitsigns = require("gitsigns")
 local util = require("minimap.util")
 local M = {}
 
--- Default highlights
-vim.api.nvim_set_hl(0, "MinimapAdded", { fg = util.extract_highlights("DiffAdd").fg })
-vim.api.nvim_set_hl(0, "MinimapChanged", { fg = util.extract_highlights("DiffChange").fg })
-vim.api.nvim_set_hl(0, "MinimapRemoved", { fg = util.extract_highlights("DiffDelete").fg })
+util.persistent_highlight(function()
+  -- Default highlights
+  vim.api.nvim_set_hl(0, "MinimapAdded", { fg = util.extract_highlights("DiffAdd").fg })
+  vim.api.nvim_set_hl(0, "MinimapChanged", { fg = util.extract_highlights("DiffChange").fg })
+  vim.api.nvim_set_hl(0, "MinimapRemoved", { fg = util.extract_highlights("DiffDelete").fg })
 
--- When in cursor line
-util.merge_hl_groups("MinimapAddedCursorLine", { fg = "MinimapAdded", bg = "MinimapCursorLine" })
-util.merge_hl_groups("MinimapChangedCursorLine", { fg = "MinimapChanged", bg = "MinimapCursorLine" })
-util.merge_hl_groups("MinimapRemovedCursorLine", { fg = "MinimapRemoved", bg = "MinimapCursorLine" })
+  -- When in cursor line
+  util.merge_hl_groups("MinimapAddedCursorLine", { fg = "MinimapAdded", bg = "MinimapCursorLine" })
+  util.merge_hl_groups("MinimapChangedCursorLine", { fg = "MinimapChanged", bg = "MinimapCursorLine" })
+  util.merge_hl_groups("MinimapRemovedCursorLine", { fg = "MinimapRemoved", bg = "MinimapCursorLine" })
 
--- When within viewport
-util.merge_hl_groups("MinimapAddedViewport", { fg = "MinimapAdded", bg = "MinimapViewport" })
-util.merge_hl_groups("MinimapChangedViewport", { fg = "MinimapChanged", bg = "MinimapViewport" })
-util.merge_hl_groups("MinimapRemovedViewport", { fg = "MinimapRemoved", bg = "MinimapViewport" })
+  -- When within viewport
+  util.merge_hl_groups("MinimapAddedViewport", { fg = "MinimapAdded", bg = "MinimapViewport" })
+  util.merge_hl_groups("MinimapChangedViewport", { fg = "MinimapChanged", bg = "MinimapViewport" })
+  util.merge_hl_groups("MinimapRemovedViewport", { fg = "MinimapRemoved", bg = "MinimapViewport" })
+end)
 
 local function build_git_palette(hunks)
   local palette = {}

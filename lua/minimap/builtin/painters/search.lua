@@ -3,14 +3,26 @@ local util = require("minimap.util")
 
 local M = {}
 
--- Default highlights
-vim.api.nvim_set_hl(0, "MinimapSearch", { link = "Search" })
+util.persistent_highlight(function()
+  -- Default highlights
+  vim.api.nvim_set_hl(0, "MinimapSearch", { link = "Search" })
 
--- Variants within minimap
-util.merge_hl_groups("MinimapSearchCursorLine", { fg = "MinimapSearch", bg = "MinimapCursorLine" })
-util.merge_hl_groups("MinimapSearchViewport", { fg = "MinimapSearch", bg = "MinimapViewport" })
+  -- Variants within minimap
+  util.merge_hl_groups("MinimapSearchCursorLine", { fg = "MinimapSearch", bg = "MinimapCursorLine" })
+  util.merge_hl_groups("MinimapSearchViewport", { fg = "MinimapSearch", bg = "MinimapViewport" })
+end)
 
 local find = string.find
+
+local function escape_string(str)
+  -- Escape Lua pattern special characters: ( ) . % + - * ? [ ] ^ $
+  -- str = str:gsub("[%(%)%.%%%+%-%*%?%[%]%^%$]", "\\%1")
+  -- Escape single quotes for shell command
+  -- str = str:gsub("'", "\\'")
+  -- Escape backslashes
+  -- str = str:gsub("\\", "\\\\")
+  return str
+end
 
 local function find_matches(text, bufnr)
   local matches = {}
@@ -22,7 +34,7 @@ local function find_matches(text, bufnr)
     local line = vim.api.nvim_buf_get_lines(bufnr, line_num - 1, line_num, false)[1]
     local start_pos = 0
     while true do
-      local match_start, match_end = find(line, text, start_pos + 1)
+      local match_start, match_end = find(line, escape_string(text), start_pos + 1)
       if match_start ~= nil then
         table.insert(matches,
           {

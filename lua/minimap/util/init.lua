@@ -54,6 +54,13 @@ function M.round(number)
   return math.floor(number + 0.5)
 end
 
+function M.persistent_highlight(fn)
+  fn()
+  vim.api.nvim_create_autocmd("ColorScheme", {
+    callback = function() fn() end,
+  })
+end
+
 function M.get_previous_buffers()
   local buffers = vim.api.nvim_command_output("ls t")
   local bufnrs = {}
@@ -62,6 +69,16 @@ function M.get_previous_buffers()
     table.insert(bufnrs, iterator())
   end
   return bufnrs
+end
+
+function M.get_visible_window_splits()
+  return vim.tbl_filter(
+    function(winid)
+      local config = vim.api.nvim_win_get_config(winid)
+      return config.relative == '' and config.split ~= ''
+    end,
+    vim.api.nvim_list_wins()
+  )
 end
 
 return M

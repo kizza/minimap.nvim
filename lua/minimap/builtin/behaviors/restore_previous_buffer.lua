@@ -5,27 +5,44 @@ local Buffer = require("minimap.components.buffer")
 local Log = require("minimap.debug.log")
 local M = {}
 
-local function restore_preivous_buffer(agent, map)
+local function restore_buffer(bufnr, agent, map)
+  -- TODO use nvim_win_open with split attribute when available
+  local restored_buffer = Buffer({ bufnr = bufnr })
+  local restore_position = "topleft vertical"
+  local restore_width = vim.fn.winwidth(vim.fn.winnr()) - map.width
+  local restore_cmd = restore_position .. " " .. restore_width .. 'split #' .. restored_buffer.bufnr
+
+  local log = Log("Restore buffer")
+  log:append("Restoring with " .. restore_cmd)
+  vim.cmd(restore_cmd)
+
+  -- Restore broken window elements
+  vim.opt.signcolumn = "yes"
+  vim.opt.number = true
+
+  return restored_buffer
+end
+
+local function restore_preivous_buffer(unloading_buffer, agent, map)
   -- if true then return nil end
   local previous_buffers = util.get_previous_buffers()
 
+
   local log = Log("Restore previous buffer")
+  log:append("Unloading of " .. unloading_buffer.bufnr)
   log:append("Previous buffers " ..
-    vim.inspect(previous_buffers) .. "\n" .. vim.inspect(vim.api.nvim_command_output("ls t")))
+    vim.inspect(previous_buffers) .. "ls=\n" .. vim.inspect(vim.api.nvim_command_output("ls t")))
 
+  -- Remove buffer being unloaded (a race condition means we sometimes try to switch to it)
+  local buffers = vim.tbl_filter(function(buf)
+    return buf ~= tostring(unloading_buffer.bufnr)
+  end, previous_buffers)
+
+  -- "Cannot switch to a closing buffer"
   if previous_buffers[1] ~= tostring(vim.fn.bufnr()) then
-    -- TODO use nvim_win_open with split attribute when available
-    local restored_buffer = Buffer({ bufnr = tonumber(previous_buffers[2]) })
-    local restore_position = "topleft vertical"
-    local restore_width = vim.fn.winwidth(vim.fn.winnr()) - map.width
-    local restore_cmd = restore_position .. " " .. restore_width .. 'split #' .. restored_buffer.bufnr
-    log:append("Restoring with " .. restore_cmd)
-    vim.cmd(restore_cmd)
+    local restored_buffer = restore_buffer(tonumber(previous_buffers[2]), agent, map)
 
-    -- Restore broken window elements
-    vim.opt.signcolumn = "yes"
-    vim.opt.number = true
-
+    log:append("Restoring buffer " .. previous_buffers[2])
     agent:emit(events.BufferActive, restored_buffer)
   else
     log:append("Closing map")
@@ -36,20 +53,39 @@ local function restore_preivous_buffer(agent, map)
 end
 
 function M.register(buffer, agent, map)
-  buffer:on(events.BufUnload, function()
+  buffer:on(events.WinClosed, function(args)
+    if args.buf == agent._.registered_buffer.bufnr then
+      local visible_window_splits = util.get_visible_window_splits() -- could haev other splits open
+      if #visible_window_splits == 2 then                            -- note: includes current window
+        -- vim.notify("Cannot close last window", vim.log.levels.INFO, { title = "Minimap" })
+        -- restore_buffer(args.buf, agent, map)
+        -- map:close()
+      end
+    end
+  end)
+
+  buffer:on(events.BufUnload, function(unloading_buffer)
     local current = Buffer({ bufnr = vim.fn.bufnr() })
+
+    -- local log = Log("Unload buffer called")
+    -- log:append("Unloading = ")
+    -- log:append(vim.inspect(unloading_buffer))
+    -- if debug.enabled() then log:write() end
 
     -- We've fallen into the minimap, open previous buffer
     if current.filetype == "minimap" then
-      restore_preivous_buffer(agent, map)
+      restore_preivous_buffer(unloading_buffer, agent, map)
     else
       -- We're unloading, the buffer we're on
       if buffer.bufnr == current.bufnr then
         buffer:debug("Closing map for this buffer")
+        vim.notify("Closing map for this buffer")
         map:close()
       else
+        map:close()
         -- Restore whatever buffer we've landed on
         buffer:debug("Restoring fallback buffer")
+        vim.notify("Restoring fallback buffer")
         vim.schedule_wrap(function()
           agent:emit(events.BufferActive, current)
         end)

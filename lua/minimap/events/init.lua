@@ -21,6 +21,7 @@ local events = {
   InsertLeave = "InsertLeave",
   TextChanged = "TextChanged",
   TextChangedI = "TextChangedI",
+  WinNew = "WinNew",
   WinClosed = "WinClosed",
   WinScrolled = "WinScrolled",
   VimResized = "VimResized",

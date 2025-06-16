@@ -3,9 +3,11 @@ local util = require("minimap.util")
 
 local M = {}
 
-if not util.hl_exists("MinimapCursorLine") then
-  util.merge_hl_groups("MinimapCursorLine", { fg = "Type", bg = "DiagnosticWarn" })
-end
+util.persistent_highlight(function()
+  if not util.hl_exists("MinimapCursorLine") then
+    util.merge_hl_groups("MinimapCursorLine", { fg = "Type", bg = "DiagnosticWarn" })
+  end
+end)
 
 local function build_palette(buffer_window)
   local current_line = vim.api.nvim_win_get_cursor(buffer_window)[1]

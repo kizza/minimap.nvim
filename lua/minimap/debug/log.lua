@@ -1,6 +1,7 @@
 local Object = require("nui.object")
 local Log = Object("MinimapLog")
 
+-- .cache/nvim/minimap.log
 local log_path = vim.fn.stdpath("cache") .. "/minimap.log"
 
 function Log:init(initial_content)
