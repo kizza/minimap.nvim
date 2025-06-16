@@ -30,6 +30,10 @@ function M.merge_tables(first_table, second_table)
   return vim.tbl_deep_extend("force", first_table, second_table)
 end
 
+function M.hl_exists(name)
+  return next(vim.api.nvim_get_hl(0, { name = name })) ~= nil
+end
+
 function M.merge_hl_groups(new_hl_group, opts)
   local merged = {}
 
